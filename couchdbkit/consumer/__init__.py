@@ -7,18 +7,19 @@
 from .base import ConsumerBase
 
 OLD_CONSUMER_URIS = dict(
-        eventlet = "couchdbkit.consumer.ceventlet.EventletConsumer",
-        gevent = "couchdbkit.consumer.cgevent.GeventConsumer",
-        sync = "couchdbkit.consumer.sync.SyncConsumer")
+    eventlet="couchdbkit.consumer.ceventlet.EventletConsumer",
+    gevent="couchdbkit.consumer.cgevent.GeventConsumer",
+    sync="couchdbkit.consumer.sync.SyncConsumer")
+
 
 def load_consumer_class(uri):
     if uri in ('eventlet', 'gevent', 'sync'):
         import warnings
         warnings.warn(
-                "Short names for uri in consumer backend are deprecated.",
-                DeprecationWarning
-                )
-        uri = OLD_CONSUMER_URIS[uri] 
+            "Short names for uri in consumer backend are deprecated.",
+            DeprecationWarning
+        )
+        uri = OLD_CONSUMER_URIS[uri]
 
     components = uri.split('.')
     klass = components.pop(-1)
@@ -26,6 +27,7 @@ def load_consumer_class(uri):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return getattr(mod, klass)
+
 
 class Consumer(object):
     """ Database change consumer

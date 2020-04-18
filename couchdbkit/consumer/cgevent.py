@@ -6,8 +6,7 @@
 import traceback
 
 import gevent
-from gevent import event
-from gevent import monkey
+from gevent import event, monkey
 
 from .base import check_callable
 from .sync import SyncConsumer
@@ -48,6 +47,7 @@ class ChangeConsumer(object):
     def consume(self, resp):
         raise NotImplementedError
 
+
 class ContinuousChangeConsumer(ChangeConsumer):
 
     def consume(self, resp):
@@ -63,6 +63,7 @@ class ContinuousChangeConsumer(ChangeConsumer):
                 if not line:
                     continue
                 self.process_change(line)
+
 
 class LongPollChangeConsumer(ChangeConsumer):
 
@@ -103,26 +104,26 @@ class GeventConsumer(SyncConsumer):
         check_callable(cb)
         params.update({"feed": "longpoll"})
         consumer = LongPollChangeConsumer(self.db, callback=cb,
-                **params)
+                                          **params)
         consumer.wait()
 
     def wait(self, cb, **params):
         check_callable(cb)
         params.update({"feed": "continuous"})
         consumer = ContinuousChangeConsumer(self.db, callback=cb,
-                **params)
+                                            **params)
         consumer.wait()
 
     def wait_once_async(self, cb, **params):
         check_callable(cb)
         params.update({"feed": "longpoll"})
         consumer = LongPollChangeConsumer(self.db, callback=cb,
-                **params)
+                                          **params)
         return consumer.wait_async()
 
     def wait_async(self, cb, **params):
         check_callable(cb)
         params.update({"feed": "continuous"})
         consumer = ContinuousChangeConsumer(self.db, callback=cb,
-                **params)
+                                            **params)
         return consumer.wait_async()

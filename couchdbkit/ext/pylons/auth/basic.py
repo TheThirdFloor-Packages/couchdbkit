@@ -4,18 +4,17 @@
 # See the NOTICE for more information.
 
 import logging
-from paste.request import parse_dict_querystring, parse_formvars
+import sys
+
 from paste.httpexceptions import HTTPUnauthorized
 from paste.httpheaders import CONTENT_LENGTH, CONTENT_TYPE
+from paste.request import parse_dict_querystring, parse_formvars
 from repoze.what.middleware import setup_auth
-from repoze.who.plugins.auth_tkt import AuthTktCookiePlugin
 from repoze.who.interfaces import IChallenger, IIdentifier
-
-import sys
+from repoze.who.plugins.auth_tkt import AuthTktCookiePlugin
 from zope.interface import implements
 
-from .adapters import GroupAdapter, PermissionAdapter, \
-Authenticator, MDPlugin
+from .adapters import Authenticator, GroupAdapter, MDPlugin, PermissionAdapter
 
 
 class BasicAuth(object):
@@ -40,7 +39,7 @@ class BasicAuth(object):
             form.update(query)
             try:
                 credentials = {
-                    'login': form['login'],
+                    'login':    form['login'],
                     'password': form['password']
                 }
             except KeyError:
@@ -64,7 +63,7 @@ class BasicAuth(object):
             return credentials
 
     def challenge(self, environ, status, app_headers, forget_headers):
-        cookies = [(h,v) for (h,v) in app_headers if h.lower() == 'set-cookie']
+        cookies = [(h, v) for (h, v) in app_headers if h.lower() == 'set-cookie']
         if not forget_headers:
             return HTTPUnauthorized()
 
@@ -75,6 +74,7 @@ class BasicAuth(object):
             headers = content_length + content_type + forget_headers
             start_response('200 OK', headers)
             return [towrite]
+
         return auth_form
 
     def remember(self, environ, identity):
@@ -82,6 +82,7 @@ class BasicAuth(object):
 
     def forget(self, environ, identity):
         return environ['repoze.who.plugins']['cookie'].forget(environ, identity)
+
 
 def AuthBasicMiddleware(app, conf, user_class):
     groups = GroupAdapter(user_class)
@@ -100,4 +101,3 @@ def AuthBasicMiddleware(app, conf, user_class):
     who_args['log_level'] = logging.DEBUG
 
     return setup_auth(app, groups, permissions, **who_args)
-

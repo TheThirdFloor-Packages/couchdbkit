@@ -27,26 +27,26 @@ except ImportError:
 
 from django.conf import settings
 from django.utils.translation import activate, deactivate_all, get_language, \
-string_concat
+    string_concat
 from django.utils.encoding import smart_str, force_unicode
 
 from couchdbkit import schema
 from couchdbkit.ext.django.loading import get_schema, register_schema, \
-get_db
+    get_db
 
 __all__ = ['Property', 'StringProperty', 'IntegerProperty',
-            'DecimalProperty', 'BooleanProperty', 'FloatProperty',
-            'DateTimeProperty', 'DateProperty', 'TimeProperty',
-            'dict_to_json', 'list_to_json', 'value_to_json',
-            'value_to_python', 'dict_to_python', 'list_to_python',
-            'convert_property', 'DocumentSchema', 'Document',
-            'SchemaProperty', 'SchemaListProperty', 'ListProperty',
-            'DictProperty', 'StringDictProperty', 'StringListProperty',
-            'SchemaDictProperty', 'SetProperty',]
-
+           'DecimalProperty', 'BooleanProperty', 'FloatProperty',
+           'DateTimeProperty', 'DateProperty', 'TimeProperty',
+           'dict_to_json', 'list_to_json', 'value_to_json',
+           'value_to_python', 'dict_to_python', 'list_to_python',
+           'convert_property', 'DocumentSchema', 'Document',
+           'SchemaProperty', 'SchemaListProperty', 'ListProperty',
+           'DictProperty', 'StringDictProperty', 'StringListProperty',
+           'SchemaDictProperty', 'SetProperty', ]
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'app_label')
+
 
 class Options(object):
     """ class based on django.db.models.options. We only keep
@@ -84,7 +84,8 @@ class Options(object):
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
+            setattr(self, 'verbose_name_plural',
+                    meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
@@ -107,7 +108,9 @@ class Options(object):
         raw = force_unicode(self.verbose_name)
         activate(lang)
         return raw
+
     verbose_name_raw = property(verbose_name_raw)
+
 
 class DocumentMeta(schema.SchemaProperties):
     def __new__(cls, name, bases, attrs):
@@ -141,6 +144,7 @@ class DocumentMeta(schema.SchemaProperties):
         else:
             setattr(cls, name, value)
 
+
 class Document(schema.Document):
     """ Document object for django extension """
     __metaclass__ = DocumentMeta
@@ -156,6 +160,7 @@ class Document(schema.Document):
             db = get_db(app_label)
             cls._db = db
         return db
+
 
 DocumentSchema = schema.DocumentSchema
 
@@ -177,8 +182,6 @@ StringDictProperty = schema.StringDictProperty
 StringListProperty = schema.StringListProperty
 SchemaDictProperty = schema.SchemaDictProperty
 SetProperty = schema.SetProperty
-
-
 
 # some utilities
 dict_to_json = schema.dict_to_json

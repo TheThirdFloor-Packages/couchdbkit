@@ -8,9 +8,10 @@ from __future__ import with_statement
 import os
 import unittest
 
+from .db import default_design_path, init_db, sync_design
 from ... import BaseDocsLoader, ResourceNotFound
-from .db import init_db, sync_design, default_design_path
 from ...utils import json
+
 
 class FixtureLoader(BaseDocsLoader):
     def __init__(self, directory):
@@ -27,11 +28,13 @@ class FixtureLoader(BaseDocsLoader):
                     docs.append(doc)
         return docs
 
+
 class TestCase(unittest.TestCase):
     """
     Basic test class that will be default load all fixtures specified in the
     fixtures attribute.
     """
+
     def __init__(self, *args, **kwargs):
         self._config = kwargs['config']
         del kwargs['config']
@@ -54,4 +57,3 @@ class TestCase(unittest.TestCase):
             if not os.path.isdir(fixtures_dir):
                 raise Exception("Fixtures dir %s not found" % fixtures_dir)
             FixtureLoader(fixtures_dir).sync(self._config['couchdb.db'])
-

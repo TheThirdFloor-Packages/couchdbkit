@@ -4,10 +4,12 @@
 # See the NOTICE for more information.
 
 import os
+
 from paste.deploy import loadapp
 from paste.script.command import Command
 
-from .db import sync_design, default_design_path
+from .db import default_design_path, sync_design
+
 
 class SyncDbCommand(Command):
     """Syncs the CouchDB views on disk with the database.
@@ -47,4 +49,3 @@ class SyncDbCommand(Command):
 
         # This syncs the main database.
         sync_design(wsgiapp.config['couchdb.db'], design_path)
-

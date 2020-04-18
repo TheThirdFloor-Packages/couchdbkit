@@ -7,6 +7,7 @@ def check_callable(cb):
     if not callable(cb):
         raise TypeError("callback isn't a callable")
 
+
 class ConsumerBase(object):
 
     def __init__(self, db, **kwargs):
@@ -25,7 +26,7 @@ class ConsumerBase(object):
 
     def wait(self, cb, **params):
         raise NotImplementedError
-    
+
     def wait_once_async(self, cb, **params):
         raise NotImplementedError
 

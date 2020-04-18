@@ -4,9 +4,9 @@
 # See the NOTICE for more information.
 
 import urlparse
-
-from restkit.contrib.wsgi_proxy import HostProxy, ALLOWED_METHODS
+from restkit.contrib.wsgi_proxy import ALLOWED_METHODS, HostProxy
 from webob import Request
+
 
 class CouchdbProxy(object):
     """\
@@ -17,11 +17,11 @@ class CouchdbProxy(object):
         from couchdbkit.wsgi import CouchdbProxy
         application = CouchdbProxy()
     """
-    
+
     def __init__(self, uri="http://127.0.0.1:5984",
-            allowed_method=ALLOWED_METHODS, **kwargs):
-        self.proxy = HostProxy(uri,  allowed_methods=allowed_method,
-                **kwargs)
+                 allowed_method=ALLOWED_METHODS, **kwargs):
+        self.proxy = HostProxy(uri, allowed_methods=allowed_method,
+                               **kwargs)
 
     def do_proxy(self, req, environ, start_response):
         """\
@@ -36,6 +36,6 @@ class CouchdbProxy(object):
             # gunicorn so we can use real path non encoded
             u = urlparse.urlparse(req.environ['RAW_URI'])
             req.environ['PATH_INFO'] = u.path
-            
+
         resp = self.do_proy(req, environ, start_response)
         return resp(environ, start_response)

@@ -22,18 +22,18 @@ Example:
 import base64
 import re
 
-from restkit import Resource, ClientResponse
-from restkit.errors import ResourceError, RequestFailed, RequestError
+from restkit import ClientResponse, Resource
+from restkit.errors import RequestError, RequestFailed, ResourceError
 from restkit.util import url_quote
 
-from . import __version__
-from .exceptions import ResourceNotFound, ResourceConflict, \
-PreconditionFailed
+from .version import __version__
+from .exceptions import PreconditionFailed, ResourceConflict, ResourceNotFound
 from .utils import json
 
 USER_AGENT = 'couchdbkit/%s' % __version__
 
 RequestFailed = RequestFailed
+
 
 class CouchDBResponse(ClientResponse):
 
@@ -100,7 +100,7 @@ class CouchdbResource(Resource):
         headers.setdefault('User-Agent', USER_AGENT)
 
         if payload is not None:
-            #TODO: handle case we want to put in payload json file.
+            # TODO: handle case we want to put in payload json file.
             if not hasattr(payload, 'read') and not isinstance(payload, basestring):
                 payload = json.dumps(payload).encode('utf-8')
                 headers.setdefault('Content-Type', 'application/json')
@@ -108,9 +108,9 @@ class CouchdbResource(Resource):
         params = encode_params(params)
         try:
             resp = Resource.request(self, method, path=path,
-                             payload=payload, headers=headers, **params)
+                                    payload=payload, headers=headers, **params)
 
-        except ResourceError, e:
+        except ResourceError as e:
             msg = getattr(e, 'msg', '')
             if e.response and msg:
                 if e.response.headers.get('content-type') == 'application/json':
@@ -126,20 +126,21 @@ class CouchdbResource(Resource):
 
             if e.status_int == 404:
                 raise ResourceNotFound(error, http_code=404,
-                        response=e.response)
+                                       response=e.response)
 
             elif e.status_int == 409:
                 raise ResourceConflict(error, http_code=409,
-                        response=e.response)
+                                       response=e.response)
             elif e.status_int == 412:
                 raise PreconditionFailed(error, http_code=412,
-                        response=e.response)
+                                         response=e.response)
             else:
                 raise
         except:
             raise
 
         return resp
+
 
 def encode_params(params):
     """ encode parameters in json if needed """
@@ -155,6 +156,7 @@ def encode_params(params):
             _params[name] = value
     return _params
 
+
 def escape_docid(docid):
     if docid.startswith('/'):
         docid = docid[1:]
@@ -164,7 +166,10 @@ def escape_docid(docid):
         docid = url_quote(docid, safe='')
     return docid
 
+
 re_sp = re.compile('\s')
+
+
 def encode_attachments(attachments):
     for k, v in attachments.iteritems():
         if v.get('stub', False):

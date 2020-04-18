@@ -3,15 +3,15 @@
 # This file is part of couchdbkit released under the MIT license. 
 # See the NOTICE for more information.
 
-from hashlib import sha256
 import os
+from hashlib import sha256
 
+from .... import Document, SchemaListProperty, StringListProperty, StringProperty
 
-from .... import Document, SchemaListProperty, StringProperty, \
-StringListProperty
 
 class Permission(Document):
     name = StringProperty(required=True)
+
 
 class Group(Document):
     """
@@ -19,6 +19,7 @@ class Group(Document):
     """
     name = StringProperty(required=True)
     permissions = SchemaListProperty(Permission)
+
 
 class User(Document):
     """The base User model. This should be extended by the user."""
@@ -57,4 +58,3 @@ class User(Document):
         if user.password[64:] != hashed_pass.hexdigest():
             return None
         return user
-

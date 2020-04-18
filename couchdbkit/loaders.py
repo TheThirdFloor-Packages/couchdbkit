@@ -22,14 +22,16 @@ from __future__ import with_statement
 
 from .designer import document, push, pushapps, pushdocs
 
+
 class BaseDocsLoader(object):
     """Baseclass for all doc loaders. """
-   
+
     def get_docs(self):
         raise NotImplementedError
 
     def sync(self, dbs, atomic=True, **kwargs):
         raise NotImplementedError
+
 
 class FileSystemDocsLoader(BaseDocsLoader):
     """ Load docs from the filesystem. This loader can find docs
@@ -54,8 +56,7 @@ class FileSystemDocsLoader(BaseDocsLoader):
         docpath = docpath or []
         if isinstance(docpath, basestring):
             docpath = [docpath]
-        self.docpaths = docpath            
-        
+        self.docpaths = docpath
 
     def get_docs(self):
         docs = []
@@ -68,20 +69,20 @@ class FileSystemDocsLoader(BaseDocsLoader):
             docs.extend(ret['docs'])
         return docs
 
-        
     def sync(self, dbs, atomic=True, **kwargs):
         for path in self.docpaths:
             pushdocs(path, dbs, atomic=atomic)
 
         for path in self.designpaths:
             pushapps(path, dbs, atomic=atomic)
- 
+
+
 class FileSystemDocLoader(BaseDocsLoader):
     """ Load only one design doc from a path on the filesystem.
         
         >>> loader = FileSystemDocLoader("/path/to/designdocfolder", "nameodesigndoc")
     """
-    
+
     def __init__(self, designpath, name, design_name=None):
         self.designpath = designpath
         self.name = name
@@ -91,9 +92,8 @@ class FileSystemDocLoader(BaseDocsLoader):
 
     def get_docs(self):
         return document(self.design_path, create=False,
-                docid=self.design_name)
+                        docid=self.design_name)
 
     def sync(self, dbs, atomic=True, **kwargs):
         push(self.design_path, dbs, atomic=atomic,
-                docid=self.design_name)
-
+             docid=self.design_name)

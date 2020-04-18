@@ -4,24 +4,24 @@
 # See the NOTICE for more information.
 
 from __future__ import with_statement
+
 import base64
 import copy
-from hashlib import md5
 import logging
 import mimetypes
 import os
 import os.path
 import re
+from hashlib import md5
 
-from .. import client
-from ..exceptions import ResourceNotFound, DesignerError, \
-BulkSaveError
 from .macros import package_shows, package_views
-from .. import utils
+from .. import client, utils
+from ..exceptions import BulkSaveError, DesignerError, ResourceNotFound
 
 if os.name == 'nt':
     def _replace_backslash(name):
         return name.replace("\\", "/")
+
 
     def _replace_slash(name):
         return name.replace("/", "\\")
@@ -29,10 +29,12 @@ else:
     def _replace_backslash(name):
         return name
 
+
     def _replace_slash(name):
         return name
 
 logger = logging.getLogger(__name__)
+
 
 class FSDoc(object):
 
@@ -100,20 +102,19 @@ class FSDoc(object):
                     if name not in attachments:
                         logger.debug("attach %s " % name)
                         db.put_attachment(doc, open(filepath, "r"),
-                                            name=name)
+                                          name=name)
 
             logger.debug("%s/%s had been pushed from %s" % (db.uri,
-                self.docid, self.docdir))
-
+                                                            self.docid, self.docdir))
 
     def attachment_stub(self, name, filepath):
         att = {}
         with open(filepath, "rb") as f:
             re_sp = re.compile('\s')
             att = {
-                    "data": re_sp.sub('',base64.b64encode(f.read())),
-                    "content_type": ';'.join(filter(None,
-                                            mimetypes.guess_type(name)))
+                "data":         re_sp.sub('', base64.b64encode(f.read())),
+                "content_type": ';'.join(filter(None,
+                                                mimetypes.guess_type(name)))
             }
 
         return att
@@ -147,7 +148,7 @@ class FSDoc(object):
 
         if 'couchapp' in self.olddoc:
             old_signatures = self.olddoc['couchapp'].get('signatures',
-                                                        {})
+                                                         {})
         else:
             old_signatures = {}
 
@@ -178,27 +179,26 @@ class FSDoc(object):
         self._doc['_attachments'] = attachments
 
         self._doc['couchapp'].update({
-            'manifest': manifest,
-            'objects': objects,
+            'manifest':   manifest,
+            'objects':    objects,
             'signatures': signatures
         })
 
-
         if self.docid.startswith('_design/'):  # process macros
             for funs in ['shows', 'lists', 'updates', 'filters',
-                    'spatial']:
+                         'spatial']:
                 if funs in self._doc:
                     package_shows(self._doc, self._doc[funs], self.docdir,
-                            objects)
+                                  objects)
 
             if 'validate_doc_update' in self._doc:
                 tmp_dict = dict(validate_doc_update=self._doc[
-                                                    "validate_doc_update"])
-                package_shows( self._doc, tmp_dict, self.docdir,
-                    objects)
+                    "validate_doc_update"])
+                package_shows(self._doc, tmp_dict, self.docdir,
+                              objects)
                 self._doc.update(tmp_dict)
 
-            if 'views' in  self._doc:
+            if 'views' in self._doc:
                 # clean views
                 # we remove empty views and malformed from the list
                 # of pushed views. We also clean manifest
@@ -217,13 +217,12 @@ class FSDoc(object):
                     else:
                         del manifest[dmanifest["views/%s" % vname]]
                 self._doc['views'] = views
-                package_views(self._doc,self._doc["views"], self.docdir,
-                        objects)
+                package_views(self._doc, self._doc["views"], self.docdir,
+                              objects)
 
             if "fulltext" in self._doc:
-                package_views(self._doc,self._doc["fulltext"], self.docdir,
-                        objects)
-
+                package_views(self._doc, self._doc["fulltext"], self.docdir,
+                              objects)
 
         return self._doc
 
@@ -236,10 +235,10 @@ class FSDoc(object):
         return False
 
     def dir_to_fields(self, current_dir='', depth=0,
-                manifest=[]):
+                      manifest=[]):
         """ process a directory and get all members """
 
-        fields={}
+        fields = {}
         if not current_dir:
             current_dir = self.docdir
         for name in os.listdir(current_dir):
@@ -259,12 +258,12 @@ class FSDoc(object):
                 if name == "couchapp":
                     manifest.append('%s/' % rel_path)
                     content = self.dir_to_fields(current_path,
-                        depth=depth+1, manifest=manifest)
+                                                 depth=depth + 1, manifest=manifest)
                 else:
                     manifest.append(rel_path)
                     content = utils.read_json(current_path)
                     if not isinstance(content, dict):
-                        content = { "meta": content }
+                        content = {"meta": content}
                 if 'signatures' in content:
                     del content['signatures']
 
@@ -284,7 +283,7 @@ class FSDoc(object):
             elif os.path.isdir(current_path):
                 manifest.append('%s/' % rel_path)
                 fields[name] = self.dir_to_fields(current_path,
-                        depth=depth+1, manifest=manifest)
+                                                  depth=depth + 1, manifest=manifest)
             else:
                 logger.debug("push %s" % rel_path)
 
@@ -304,18 +303,18 @@ class FSDoc(object):
                             content.encode('utf-8')
                         except UnicodeError:
                             logger.warning(
-                            "plan B didn't work, %s is a binary" % current_path)
+                                "plan B didn't work, %s is a binary" % current_path)
                             logger.warning("use plan C: encode to base64")
                             content = "base64-encoded;%s" % base64.b64encode(
-                                                                        content)
-
+                                content)
 
                 # remove extension
                 name, ext = os.path.splitext(name)
                 if name in fields:
                     logger.warning(
-        "%(name)s is already in properties. Can't add (%(fqn)s)" % {
-                            "name": name, "fqn": rel_path })
+                        "%(name)s is already in properties. Can't add (%(fqn)s)" % {
+                            "name": name, "fqn": rel_path
+                        })
                 else:
                     manifest.append(rel_path)
                     fields[name] = content
@@ -369,20 +368,22 @@ class FSDoc(object):
                 attachdir = os.path.join(current_path, '_attachments')
                 if os.path.isdir(attachdir):
                     for attachment in self._process_attachments(attachdir,
-                                                        vendor=name):
+                                                                vendor=name):
                         yield attachment
 
     def index(self, dburl, index):
         if index is not None:
             return "%s/%s/%s" % (dburl, self.docid, index)
         elif os.path.isfile(os.path.join(self.docdir, "_attachments",
-                    'index.html')):
+                                         'index.html')):
             return "%s/%s/index.html" % (dburl, self.docid)
         return False
+
 
 def document(path, create=False, docid=None, is_ddoc=True):
     """ simple function to retrive a doc object from filesystem """
     return FSDoc(path, create=create, docid=docid, is_ddoc=is_ddoc)
+
 
 def push(path, dbs, atomic=True, force=False, docid=None):
     """ push a document from the fs to one or more dbs. Identic to
@@ -396,6 +397,7 @@ def push(path, dbs, atomic=True, force=False, docid=None):
     if os.path.exists(docspath):
         pushdocs(docspath, dbs, atomic=atomic)
 
+
 def pushapps(path, dbs, atomic=True, export=False, couchapprc=False):
     """ push all couchapps in one folder like couchapp pushapps command
     line """
@@ -407,7 +409,7 @@ def pushapps(path, dbs, atomic=True, export=False, couchapprc=False):
         appdir = os.path.join(path, d)
         if os.path.isdir(appdir):
             if couchapprc and not os.path.isfile(os.path.join(appdir,
-                '.couchapprc')):
+                                                              '.couchapprc')):
                 continue
             doc = document(appdir)
             if not atomic:
@@ -416,7 +418,7 @@ def pushapps(path, dbs, atomic=True, export=False, couchapprc=False):
                 apps.append(doc)
     if apps:
         if export:
-            docs= [doc.doc() for doc in apps]
+            docs = [doc.doc() for doc in apps]
             jsonobj = {'docs': docs}
             return jsonobj
         else:
@@ -502,6 +504,7 @@ def pushdocs(path, dbs, atomic=True, export=False):
                 if docs1:
                     db.save_docs(docs1)
 
+
 def clone(db, docid, dest=None, rev=None):
     """
     Clone a CouchDB document to the fs.
@@ -519,7 +522,6 @@ def clone(db, docid, dest=None, rev=None):
     else:
         doc = db.open_doc(docid, rev=rev)
     docid = doc['_id']
-
 
     metadata = doc.get('couchapp', {})
 
@@ -561,7 +563,6 @@ def clone(db, docid, dest=None, rev=None):
                     except KeyError:
                         break
 
-
                     if isinstance(content, basestring):
                         _ref = md5(utils.to_bytestring(content)).hexdigest()
                         if objects and _ref in objects:
@@ -591,7 +592,6 @@ def clone(db, docid, dest=None, rev=None):
                             break
                         temp = temp[key2]
 
-
     # second pass for missing key or in case
     # manifest isn't in app
     for key in doc.iterkeys():
@@ -620,7 +620,7 @@ def clone(db, docid, dest=None, rev=None):
                     os.makedirs(vs_item_dir)
                 for func_name, func in vs_item.iteritems():
                     filename = os.path.join(vs_item_dir, '%s.js' %
-                            func_name)
+                                            func_name)
                     utils.write_content(filename, func)
                     logger.warning("clone view not in manifest: %s" % filename)
         elif key in ('shows', 'lists', 'filter', 'update'):
@@ -629,7 +629,7 @@ def clone(db, docid, dest=None, rev=None):
                 os.makedirs(showpath)
             for func_name, func in doc[key].iteritems():
                 filename = os.path.join(showpath, '%s.js' %
-                        func_name)
+                                        func_name)
                 utils.write_content(filename, func)
                 logger.warning(
                     "clone show or list not in manifest: %s" % filename)
@@ -673,7 +673,7 @@ def clone(db, docid, dest=None, rev=None):
             if filename.startswith('vendor'):
                 attach_parts = utils.split_path(filename)
                 vendor_attachdir = os.path.join(path, attach_parts.pop(0),
-                        attach_parts.pop(0), '_attachments')
+                                                attach_parts.pop(0), '_attachments')
                 filepath = os.path.join(vendor_attachdir, *attach_parts)
             else:
                 filepath = os.path.join(attachdir, filename)
@@ -690,6 +690,7 @@ def clone(db, docid, dest=None, rev=None):
                 logger.debug("clone attachment: %s" % filename)
 
     logger.debug("%s/%s cloned in %s" % (db.uri, docid, dest))
+
 
 def clone_design_doc(source, dest, rev=None):
     """ Clone a design document from it's url like couchapp does.

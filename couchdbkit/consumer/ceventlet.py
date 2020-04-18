@@ -44,6 +44,7 @@ class ChangeConsumer(object):
     def consume(self, resp):
         raise NotImplementedError
 
+
 class ContinuousChangeConsumer(ChangeConsumer):
 
     def consume(self, resp):
@@ -102,26 +103,25 @@ class EventletConsumer(SyncConsumer):
         check_callable(cb)
         params.update({"feed": "longpoll"})
         consumer = LongPollChangeConsumer(self.db, callback=cb,
-                **params)
+                                          **params)
         consumer.wait()
 
     def wait(self, cb, **params):
         params.update({"feed": "continuous"})
         consumer = ContinuousChangeConsumer(self.db, callback=cb,
-                **params)
+                                            **params)
         consumer.wait()
 
     def wait_once_async(self, cb, **params):
         check_callable(cb)
         params.update({"feed": "longpoll"})
         consumer = LongPollChangeConsumer(self.db, callback=cb,
-                **params)
+                                          **params)
         return consumer.wait_async()
 
     def wait_async(self, cb, **params):
         check_callable(cb)
         params.update({"feed": "continuous"})
         consumer = ContinuousChangeConsumer(self.db, callback=cb,
-                **params)
+                                            **params)
         return consumer.wait_async()
-

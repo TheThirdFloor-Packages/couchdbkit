@@ -9,6 +9,7 @@ from ...client import Server
 from ...designer import pushapps
 from ...schema import Document
 
+
 def init_from_config(config):
     """Initialize the database given a pylons config. This assumes the
     configuration format layed out on the wiki. This will only initialize the
@@ -22,6 +23,7 @@ def init_from_config(config):
     config['couchdb.db'] = init_db(uri, dbname)
     config['couchdb.fixtures'] = os.path.join(config['pylons.paths']['root'], "fixtures")
 
+
 def init_db(uri, dbname, main_db=True):
     """Returns a db object and syncs the design documents on demand.
     If main_db is set to true then all models will use that one by default.
@@ -33,13 +35,14 @@ def init_db(uri, dbname, main_db=True):
         Document.set_db(db)
     return db
 
+
 def sync_design(db, path):
     """Synchronizes the design documents with the database passed in."""
     pushapps(path, db)
+
 
 def default_design_path(config):
     """Returns full path to the default design documents path, it's _design in
     the pylons root path
     """
     return os.path.join(config['pylons.paths']['root'], "_design")
-

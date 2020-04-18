@@ -29,23 +29,21 @@ Example:
 
 UNKOWN_INFO = {}
 
-
+import time
 from collections import deque
 from itertools import groupby
 from mimetypes import guess_type
-import time
 
 from restkit.util import url_quote
 
-from .exceptions import InvalidAttachment, NoResultFound, \
-ResourceNotFound, ResourceConflict, BulkSaveError, MultipleResultsFound
 from . import resource
+from .exceptions import BulkSaveError, InvalidAttachment, MultipleResultsFound, NoResultFound, ResourceConflict, \
+    ResourceNotFound
+from .schema.util import maybe_schema_wrapper
 from .utils import validate_dbname
 
-from .schema.util import maybe_schema_wrapper
-
-
 DEFAULT_UUID_BATCH_COUNT = 1000
+
 
 def _maybe_serialize(doc):
     if hasattr(doc, "to_json"):
@@ -61,6 +59,7 @@ def _maybe_serialize(doc):
 
     return doc, False
 
+
 class Server(object):
     """ Server object that allows you to access and manage a couchdb node.
     A Server object can be used like any `dict` object.
@@ -69,10 +68,9 @@ class Server(object):
     resource_class = resource.CouchdbResource
 
     def __init__(self, uri='http://127.0.0.1:5984',
-            uuid_batch_count=DEFAULT_UUID_BATCH_COUNT,
-            resource_class=None, resource_instance=None,
-            **client_opts):
-
+                 uuid_batch_count=DEFAULT_UUID_BATCH_COUNT,
+                 resource_class=None, resource_instance=None,
+                 **client_opts):
         """ constructor for Server object
 
         @param uri: uri of CouchDb host
@@ -95,7 +93,7 @@ class Server(object):
             self.resource_class = resource_class
 
         if resource_instance and isinstance(resource_instance,
-                                resource.CouchdbResource):
+                                            resource.CouchdbResource):
             resource_instance.initial['uri'] = uri
             self.res = resource_instance.clone()
             if client_opts:
@@ -158,7 +156,7 @@ class Server(object):
         """
         del self[dbname]
 
-    #TODO: maintain list of replications
+    # TODO: maintain list of replications
     def replicate(self, source, target, **params):
         """
         simple handler for replication
@@ -207,7 +205,7 @@ class Server(object):
 
     def __delitem__(self, dbname):
         ret = self.res.delete('/%s/' % url_quote(dbname,
-            safe=":")).json_body
+                                                 safe=":")).json_body
         return ret
 
     def __contains__(self, dbname):
@@ -234,6 +232,7 @@ class Server(object):
         dbname = url_quote(dbname, safe=":")
         return "/".join([self.uri, dbname])
 
+
 class Database(object):
     """ Object that abstract access to a CouchDB database
     A Database object can act as a Dict object.
@@ -254,7 +253,7 @@ class Database(object):
         if server is not None:
             if not hasattr(server, 'next_uuid'):
                 raise TypeError('%s is not a couchdbkit.Server instance' %
-                            server.__class__.__name__)
+                                server.__class__.__name__)
             self.server = server
         else:
             self.server = server = Server(self.server_uri, **params)
@@ -295,13 +294,17 @@ class Database(object):
         path = "/_compact"
         if dname is not None:
             path = "%s/%s" % (path, resource.escape_docid(dname))
-        res = self.res.post(path, headers={"Content-Type":
-            "application/json"})
+        res = self.res.post(path, headers={
+            "Content-Type":
+                "application/json"
+        })
         return res.json_body
 
     def view_cleanup(self):
-        res = self.res.post('/_view_cleanup', headers={"Content-Type":
-            "application/json"})
+        res = self.res.post('/_view_cleanup', headers={
+            "Content-Type":
+                "application/json"
+        })
         return res.json_body
 
     def flush(self):
@@ -310,8 +313,8 @@ class Database(object):
 
         # save ddocs
         all_ddocs = self.all_docs(startkey="_design",
-                            endkey="_design/"+u"\u9999",
-                            include_docs=True)
+                                  endkey="_design/" + u"\u9999",
+                                  include_docs=True)
         ddocs = []
         for ddoc in all_ddocs:
             doc = ddoc['doc']
@@ -390,6 +393,7 @@ class Database(object):
             return wrapper(doc)
 
         return doc
+
     get = open_doc
 
     def list(self, list_name, view_name, **params):
@@ -483,7 +487,7 @@ class Database(object):
         return response['etag'].strip('"')
 
     def save_doc(self, doc, encode_attachments=True, force_update=False,
-            **params):
+                 **params):
         """ Save a document. It will use the `_id` member of the document
         or request a new uuid from CouchDB. IDs are attached to
         documents on the client side because POST has the curious property of
@@ -512,27 +516,26 @@ class Database(object):
             docid1 = resource.escape_docid(doc1['_id'])
             try:
                 res = self.res.put(docid1, payload=doc1,
-                        **params).json_body
+                                   **params).json_body
             except ResourceConflict:
                 if force_update:
                     doc1['_rev'] = self.get_rev(docid)
-                    res =self.res.put(docid1, payload=doc1,
-                            **params).json_body
+                    res = self.res.put(docid1, payload=doc1,
+                                       **params).json_body
                 else:
                     raise
         else:
             try:
                 doc['_id'] = self.server.next_uuid()
-                res =  self.res.put(doc['_id'], payload=doc1,
-                        **params).json_body
+                res = self.res.put(doc['_id'], payload=doc1,
+                                   **params).json_body
             except:
                 res = self.res.post(payload=doc1, **params).json_body
 
         if 'batch' in params and 'id' in res:
-            doc1.update({ '_id': res['id']})
+            doc1.update({'_id': res['id']})
         else:
             doc1.update({'_id': res['id'], '_rev': res['rev']})
-
 
         if schema:
             doc._doc = doc1
@@ -541,7 +544,7 @@ class Database(object):
         return res
 
     def save_docs(self, docs, use_uuids=True, all_or_nothing=False, new_edits=None,
-            **params):
+                  **params):
         """ bulk save. Modify Multiple Documents With a Single Request
 
         @param docs: list of docs
@@ -579,7 +582,7 @@ class Database(object):
                 if nextid:
                     doc['_id'] = nextid
 
-        payload = { "docs": docs1 }
+        payload = {"docs": docs1}
         if all_or_nothing:
             payload["all_or_nothing"] = True
         if new_edits is not None:
@@ -587,7 +590,7 @@ class Database(object):
 
         # update docs
         results = self.res.post('/_bulk_docs',
-                payload=payload, **params).json_body
+                                payload=payload, **params).json_body
 
         errors = []
         for i, res in enumerate(results):
@@ -596,21 +599,22 @@ class Database(object):
             else:
                 if docs_schema[i]:
                     docs[i]._doc.update({
-                        '_id': res['id'],
+                        '_id':  res['id'],
                         '_rev': res['rev']
                     })
                 else:
                     docs[i].update({
-                        '_id': res['id'],
+                        '_id':  res['id'],
                         '_rev': res['rev']
                     })
         if errors:
             raise BulkSaveError(errors, results)
         return results
+
     bulk_save = save_docs
 
     def delete_docs(self, docs, all_or_nothing=False,
-            empty_on_delete=False, **params):
+                    empty_on_delete=False, **params):
         """ bulk delete.
         It adds '_deleted' member to doc then uses bulk_save to save them.
 
@@ -628,9 +632,11 @@ class Database(object):
 
         if empty_on_delete:
             for doc in docs:
-                new_doc = {"_id": doc["_id"],
-                        "_rev": doc["_rev"],
-                        "_deleted": True}
+                new_doc = {
+                    "_id":      doc["_id"],
+                    "_rev":     doc["_rev"],
+                    "_deleted": True
+                }
                 doc.clear()
                 doc.update(new_doc)
         else:
@@ -638,7 +644,7 @@ class Database(object):
                 doc['_deleted'] = True
 
         return self.bulk_save(docs, use_uuids=False,
-                all_or_nothing=all_or_nothing, **params)
+                              all_or_nothing=all_or_nothing, **params)
 
     bulk_delete = delete_docs
 
@@ -651,7 +657,7 @@ class Database(object):
 
             {"ok":true,"rev":"2839830636"}
         """
-        result = { 'ok': False }
+        result = {'ok': False}
 
         doc1, schema = _maybe_serialize(doc)
         if isinstance(doc1, dict):
@@ -660,19 +666,19 @@ class Database(object):
 
             docid = resource.escape_docid(doc1['_id'])
             result = self.res.delete(docid, rev=doc1['_rev'], **params).json_body
-        elif isinstance(doc1, basestring): # we get a docid
+        elif isinstance(doc1, basestring):  # we get a docid
             rev = self.get_rev(doc1)
             docid = resource.escape_docid(doc1)
             result = self.res.delete(docid, rev=rev, **params).json_body
 
         if schema:
             doc._doc.update({
-                "_rev": result['rev'],
+                "_rev":     result['rev'],
                 "_deleted": True
             })
         elif isinstance(doc, dict):
             doc.update({
-                "_rev": result['rev'],
+                "_rev":     result['rev'],
                 "_deleted": True
             })
         return result
@@ -713,18 +719,18 @@ class Database(object):
             result = self.res.copy('/%s' % docid, headers=headers).json_body
             return result
 
-        return { 'ok': False }
+        return {'ok': False}
 
     def raw_view(self, view_path, params):
         if 'keys' in params:
             keys = params.pop('keys')
-            return self.res.post(view_path, payload={ 'keys': keys }, **params)
+            return self.res.post(view_path, payload={'keys': keys}, **params)
         else:
             return self.res.get(view_path, **params)
 
     def raw_temp_view(db, design, params):
         return db.res.post('_temp_view', payload=design,
-               headers={"Content-Type": "application/json"}, **params)
+                           headers={"Content-Type": "application/json"}, **params)
 
     def view(self, view_name, schema=None, wrapper=None, **params):
         """ get view results from database. viewname is generally
@@ -762,25 +768,24 @@ class Database(object):
         """ get adhoc view results. Like view it reeturn a ViewResult object."""
         return ViewResults(self.raw_temp_view, design, wrapper, schema, params)
 
-    def search( self, view_name, handler='_fti/_design', wrapper=None, schema=None, **params):
+    def search(self, view_name, handler='_fti/_design', wrapper=None, schema=None, **params):
         """ Search. Return results from search. Use couchdb-lucene
         with its default settings by default."""
         return ViewResults(self.raw_view,
-                    "/%s/%s" % (handler, view_name),
-                    wrapper=wrapper, schema=schema, params=params)
+                           "/%s/%s" % (handler, view_name),
+                           wrapper=wrapper, schema=schema, params=params)
 
     def documents(self, schema=None, wrapper=None, **params):
         """ return a ViewResults objects containing all documents.
         This is a shorthand to view function.
         """
         return ViewResults(self.raw_view, '_all_docs',
-                wrapper=wrapper, schema=schema, params=params)
+                           wrapper=wrapper, schema=schema, params=params)
+
     iterdocuments = documents
 
-
-
     def put_attachment(self, doc, content, name=None, content_type=None,
-            content_length=None, headers=None):
+                       content_length=None, headers=None):
         """ Add attachement to a document. All attachments are streamed.
 
         @param doc: dict, document object
@@ -838,7 +843,7 @@ class Database(object):
 
         docid = resource.escape_docid(doc1['_id'])
         res = self.res(docid).put(name, payload=content,
-                headers=headers, rev=doc1['_rev']).json_body
+                                  headers=headers, rev=doc1['_rev']).json_body
 
         if res['ok']:
             new_doc = self.get(doc1['_id'], rev=res['rev'])
@@ -859,15 +864,14 @@ class Database(object):
         name = url_quote(name, safe="")
 
         res = self.res(docid).delete(name, rev=doc1['_rev'],
-                headers=headers).json_body
+                                     headers=headers).json_body
         if res['ok']:
             new_doc = self.get(doc1['_id'], rev=res['rev'])
             doc.update(new_doc)
         return res['ok']
 
-
     def fetch_attachment(self, id_or_doc, name, stream=False,
-            headers=None):
+                         headers=None):
         """ get attachment in a document
 
         @param id_or_doc: str or dict, doc id or document dict
@@ -890,7 +894,6 @@ class Database(object):
             return resp.body_stream()
         return resp.body_string(charset="utf-8")
 
-
     def ensure_full_commit(self):
         """ commit all docs in memory """
         return self.res.post('_ensure_full_commit', headers={
@@ -910,15 +913,15 @@ class Database(object):
         doc['_id'] = docid
         self.save_doc(doc)
 
-
     def __delitem__(self, docid):
-       self.delete_doc(docid)
+        self.delete_doc(docid)
 
     def __iter__(self):
         return self.documents().iterator()
 
     def __nonzero__(self):
         return (len(self) > 0)
+
 
 class ViewResults(object):
     """
@@ -941,6 +944,7 @@ class ViewResults(object):
         wrap_doc = params.get('wrap_doc', schema is not None)
         if schema:
             schema_wrapper = maybe_schema_wrapper(schema, params)
+
             def row_wrapper(row):
                 data = row.get('value')
                 docid = row.get('id')
@@ -1021,7 +1025,7 @@ class ViewResults(object):
     def fetch(self):
         """ fetch results and cache them """
         # reset dynamic keys
-        for key in  self._dynamic_keys:
+        for key in self._dynamic_keys:
             try:
                 delattr(self, key)
             except:
@@ -1030,8 +1034,8 @@ class ViewResults(object):
 
         self._result_cache = self.fetch_raw().json_body
         assert isinstance(self._result_cache, dict), 'received an invalid ' \
-            'response of type %s: %s' % \
-            (type(self._result_cache), repr(self._result_cache))
+                                                     'response of type %s: %s' % \
+                                                     (type(self._result_cache), repr(self._result_cache))
         self._total_rows = self._result_cache.get('total_rows')
         self._offset = self._result_cache.get('offset', 0)
 
@@ -1041,7 +1045,6 @@ class ViewResults(object):
             if key not in ["total_rows", "offset", "rows"]:
                 self._dynamic_keys.append(key)
                 setattr(self, key, self._result_cache[key])
-
 
     def fetch_raw(self):
         """ retrive the raw result """
@@ -1096,6 +1099,3 @@ class ViewResults(object):
 
     def __nonzero__(self):
         return bool(len(self))
-
-
-

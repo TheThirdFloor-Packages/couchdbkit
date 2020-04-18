@@ -54,7 +54,7 @@ class ChangesStream(object):
                 else:
                     line = line[:-1]
                 if not line:
-                    #heartbeat
+                    # heartbeat
                     continue
 
                 if line.endswith(","):

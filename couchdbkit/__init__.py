@@ -3,41 +3,32 @@
 # This file is part of couchdbkit released under the MIT license.
 # See the NOTICE for more information.
 
-from .version import version_info, __version__
+import logging
 
-from .resource import  RequestFailed, CouchdbResource
-from .exceptions import InvalidAttachment, DuplicatePropertyError,\
-BadValueError, MultipleResultsFound, NoResultFound, ReservedWordError,\
-DocsPathNotFound, BulkSaveError, ResourceNotFound, ResourceConflict, \
-PreconditionFailed
-
-from .client import Server, Database, ViewResults
 from .changes import ChangesStream
+from .client import Database, Server, ViewResults
 from .consumer import Consumer
-from .designer import document, push, pushdocs, pushapps, clone
+from .designer import clone, document, push, pushapps, pushdocs
+from .exceptions import BadValueError, BulkSaveError, DocsPathNotFound, DuplicatePropertyError, InvalidAttachment, \
+    MultipleResultsFound, NoResultFound, PreconditionFailed, ReservedWordError, ResourceConflict, ResourceNotFound
 from .external import External
 from .loaders import BaseDocsLoader, FileSystemDocsLoader
-
-from .schema import (
-    Property, IntegerProperty, DecimalProperty, BooleanProperty, FloatProperty, StringProperty,
-    DateTimeProperty, DateProperty, TimeProperty,
-    dict_to_json, dict_to_json, dict_to_json,
-    value_to_python, dict_to_python,
-    DocumentSchema, DocumentBase, Document, StaticDocument, contain,
-    QueryMixin, AttachmentMixin,
-    SchemaProperty, SchemaListProperty, SchemaDictProperty,
-    ListProperty, DictProperty, StringDictProperty, StringListProperty, SetProperty
-)
-
-import logging
+from .resource import CouchdbResource, RequestFailed
+from .schema import (AttachmentMixin, BooleanProperty, DateProperty, DateTimeProperty, DecimalProperty, DictProperty,
+                     Document, DocumentBase, DocumentSchema, FloatProperty, IntegerProperty, ListProperty, Property,
+                     QueryMixin, SchemaDictProperty, SchemaListProperty, SchemaProperty, SetProperty, StaticDocument,
+                     StringDictProperty, StringListProperty, StringProperty, TimeProperty, contain, dict_to_json,
+                     dict_to_json, dict_to_json, dict_to_python, value_to_python)
+from .version import __version__, version_info
 
 LOG_LEVELS = {
     "critical": logging.CRITICAL,
-    "error": logging.ERROR,
-    "warning": logging.WARNING,
-    "info": logging.INFO,
-    "debug": logging.DEBUG
+    "error":    logging.ERROR,
+    "warning":  logging.WARNING,
+    "info":     logging.INFO,
+    "debug":    logging.DEBUG
 }
+
 
 def set_logging(level, handler=None):
     """
@@ -55,4 +46,3 @@ def set_logging(level, handler=None):
 
     handler.setFormatter(logging.Formatter(format, datefmt))
     logger.addHandler(handler)
-

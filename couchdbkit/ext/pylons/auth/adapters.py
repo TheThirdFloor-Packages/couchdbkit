@@ -4,9 +4,9 @@
 # See the NOTICE for more information.
 
 from repoze.what.adapters import BaseSourceAdapter
-from repoze.who.interfaces import IAuthenticator
-from repoze.who.interfaces import IMetadataProvider
+from repoze.who.interfaces import IAuthenticator, IMetadataProvider
 from zope.interface import implements
+
 
 class GroupAdapter(BaseSourceAdapter):
     """ group adapter """
@@ -34,6 +34,7 @@ class GroupAdapter(BaseSourceAdapter):
     def _section_exists(self, section):
         raise NotImplementedError()
 
+
 class PermissionAdapter(BaseSourceAdapter):
     def __init__(self, db):
         self.db = db
@@ -57,6 +58,7 @@ class PermissionAdapter(BaseSourceAdapter):
     def _section_exists(self, section):
         raise NotImplementedError()
 
+
 class Authenticator(object):
     implements(IAuthenticator)
 
@@ -73,6 +75,7 @@ class Authenticator(object):
         identity['login'] = str(user.login)
         identity['user'] = user
         return user._id
+
 
 class MDPlugin(object):
     implements(IMetadataProvider)

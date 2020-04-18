@@ -5,16 +5,18 @@
 
 """ properties used by Document object """
 
-import decimal
 import datetime
+import decimal
 import re
 import time
 
 try:
     from collections import MutableSet, Iterable
 
+
     def is_iterable(c):
         return isinstance(c, Iterable)
+
 
     support_setproperty = True
 except ImportError:
@@ -23,14 +25,14 @@ except ImportError:
 from couchdbkit.exceptions import BadValueError
 
 __all__ = ['ALLOWED_PROPERTY_TYPES', 'Property', 'StringProperty',
-        'IntegerProperty', 'DecimalProperty', 'BooleanProperty',
-        'FloatProperty', 'DateTimeProperty', 'DateProperty',
-        'TimeProperty', 'DictProperty', 'StringDictProperty',
-        'ListProperty', 'StringListProperty',
-        'dict_to_json', 'list_to_json',
-        'value_to_json', 'MAP_TYPES_PROPERTIES', 'value_to_python',
-        'dict_to_python', 'list_to_python', 'convert_property',
-        'value_to_property', 'LazyDict', 'LazyList']
+           'IntegerProperty', 'DecimalProperty', 'BooleanProperty',
+           'FloatProperty', 'DateTimeProperty', 'DateProperty',
+           'TimeProperty', 'DictProperty', 'StringDictProperty',
+           'ListProperty', 'StringListProperty',
+           'dict_to_json', 'list_to_json',
+           'value_to_json', 'MAP_TYPES_PROPERTIES', 'value_to_python',
+           'dict_to_python', 'list_to_python', 'convert_property',
+           'value_to_property', 'LazyDict', 'LazyList']
 
 if support_setproperty:
     __all__ += ['SetProperty', 'LazySet']
@@ -55,8 +57,10 @@ ALLOWED_PROPERTY_TYPES = set([
 
 re_date = re.compile('^(\d{4})\D?(0[1-9]|1[0-2])\D?([12]\d|0[1-9]|3[01])$')
 re_time = re.compile('^([01]\d|2[0-3])\D?([0-5]\d)\D?([0-5]\d)?\D?(\d{3})?$')
-re_datetime = re.compile('^(\d{4})\D?(0[1-9]|1[0-2])\D?([12]\d|0[1-9]|3[01])(\D?([01]\d|2[0-3])\D?([0-5]\d)\D?([0-5]\d)?\D?(\d{3})?([zZ]|([\+-])([01]\d|2[0-3])\D?([0-5]\d)?)?)?$')
+re_datetime = re.compile(
+    '^(\d{4})\D?(0[1-9]|1[0-2])\D?([12]\d|0[1-9]|3[01])(\D?([01]\d|2[0-3])\D?([0-5]\d)\D?([0-5]\d)?\D?(\d{3})?([zZ]|([\+-])([01]\d|2[0-3])\D?([0-5]\d)?)?)?$')
 re_decimal = re.compile('^(\d+)\.(\d+)$')
+
 
 class Property(object):
     """ Property base which all other properties
@@ -64,8 +68,8 @@ class Property(object):
     creation_counter = 0
 
     def __init__(self, verbose_name=None, name=None,
-            default=None, required=False, validators=None,
-            choices=None):
+                 default=None, required=False, validators=None,
+                 choices=None):
         """ Default constructor for a property.
 
         :param verbose_name: str, verbose name of field, could
@@ -169,6 +173,7 @@ class Property(object):
 
     data_type = None
 
+
 class StringProperty(Property):
     """ string property str or unicode property
 
@@ -179,7 +184,7 @@ class StringProperty(Property):
 
     def validate(self, value, required=True):
         value = super(StringProperty, self).validate(value,
-                required=required)
+                                                     required=required)
 
         if value is None:
             return value
@@ -190,6 +195,7 @@ class StringProperty(Property):
         return value
 
     data_type = unicode
+
 
 class IntegerProperty(Property):
     """ Integer property. map to int
@@ -203,7 +209,7 @@ class IntegerProperty(Property):
 
     def validate(self, value, required=True):
         value = super(IntegerProperty, self).validate(value,
-                required=required)
+                                                      required=required)
 
         if value is None:
             return value
@@ -212,12 +218,15 @@ class IntegerProperty(Property):
             raise BadValueError(
                 'Property %s must be %s or long instance, not a %s'
                 % (self.name, type(self.data_type).__name__,
-                    type(value).__name__))
+                   type(value).__name__))
 
         return value
 
     data_type = int
+
+
 LongProperty = IntegerProperty
+
 
 class FloatProperty(Property):
     """ Float property, map to python float
@@ -229,7 +238,7 @@ class FloatProperty(Property):
 
     def validate(self, value, required=True):
         value = super(FloatProperty, self).validate(value,
-                required=required)
+                                                    required=required)
 
         if value is None:
             return value
@@ -240,7 +249,10 @@ class FloatProperty(Property):
                 % (self.name, type(value).__name__))
 
         return value
+
+
 Number = FloatProperty
+
 
 class BooleanProperty(Property):
     """ Boolean property, map to python bool
@@ -252,7 +264,7 @@ class BooleanProperty(Property):
 
     def validate(self, value, required=True):
         value = super(BooleanProperty, self).validate(value,
-                required=required)
+                                                      required=required)
 
         if value is None:
             return value
@@ -268,6 +280,7 @@ class BooleanProperty(Property):
         """test if boolean is empty"""
         return value is None
 
+
 class DecimalProperty(Property):
     """ Decimal property, map to Decimal python object
 
@@ -281,6 +294,7 @@ class DecimalProperty(Property):
     def to_json(self, value):
         return unicode(value)
 
+
 class DateTimeProperty(Property):
     """DateTime property. It convert iso3339 string
     to python and vice-versa. Map to datetime.datetime
@@ -290,7 +304,7 @@ class DateTimeProperty(Property):
     """
 
     def __init__(self, verbose_name=None, auto_now=False, auto_now_add=False,
-               **kwds):
+                 **kwds):
         super(DateTimeProperty, self).__init__(verbose_name, **kwds)
         self.auto_now = auto_now
         self.auto_now_add = auto_now_add
@@ -303,7 +317,7 @@ class DateTimeProperty(Property):
 
         if value and not isinstance(value, self.data_type):
             raise BadValueError('Property %s must be a %s, current is %s' %
-                          (self.name, self.data_type.__name__, type(value).__name__))
+                                (self.name, self.data_type.__name__, type(value).__name__))
         return value
 
     def default_value(self):
@@ -314,12 +328,12 @@ class DateTimeProperty(Property):
     def to_python(self, value):
         if isinstance(value, basestring):
             try:
-                value = value.split('.', 1)[0] # strip out microseconds
-                value = value[0:19] # remove timezone
+                value = value.split('.', 1)[0]  # strip out microseconds
+                value = value[0:19]  # remove timezone
                 value = datetime.datetime.strptime(value, '%Y-%m-%dT%H:%M:%S')
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueError('Invalid ISO date/time %r [%s]' %
-                        (value, str(e)))
+                                 (value, str(e)))
         return value
 
     def to_json(self, value):
@@ -335,6 +349,7 @@ class DateTimeProperty(Property):
     @staticmethod
     def now():
         return datetime.datetime.utcnow()
+
 
 class DateProperty(DateTimeProperty):
     """ Date property, like DateTime property but only
@@ -352,15 +367,16 @@ class DateProperty(DateTimeProperty):
         if isinstance(value, basestring):
             try:
                 value = datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueError('Invalid ISO date %r [%s]' % (value,
-                    str(e)))
+                                                               str(e)))
         return value
 
     def to_json(self, value):
         if value is None:
             return value
         return value.isoformat()
+
 
 class TimeProperty(DateTimeProperty):
     """ Date property, like DateTime property but only
@@ -378,11 +394,11 @@ class TimeProperty(DateTimeProperty):
     def to_python(self, value):
         if isinstance(value, basestring):
             try:
-                value = value.split('.', 1)[0] # strip out microseconds
+                value = value.split('.', 1)[0]  # strip out microseconds
                 value = datetime.time(*time.strptime(value, '%H:%M:%S')[3:6])
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueError('Invalid ISO time %r [%s]' % (value,
-                    str(e)))
+                                                               str(e)))
         return value
 
     def to_json(self, value):
@@ -395,7 +411,7 @@ class DictProperty(Property):
     """ A property that stores a dict of things"""
 
     def __init__(self, verbose_name=None, default=None,
-        required=False, **kwds):
+                 required=False, **kwds):
         """
         :args verbose_name: Optional verbose name.
         :args default: Optional default value; if omitted, an empty list is used.
@@ -408,7 +424,7 @@ class DictProperty(Property):
             default = {}
 
         Property.__init__(self, verbose_name, default=default,
-            required=required, **kwds)
+                          required=required, **kwds)
 
     data_type = dict
 
@@ -426,7 +442,7 @@ class DictProperty(Property):
         except BadValueError:
             raise BadValueError(
                 'Items of %s dict must all be in %s' %
-                    (self.name, ALLOWED_PROPERTY_TYPES))
+                (self.name, ALLOWED_PROPERTY_TYPES))
         return value
 
     def default_value(self):
@@ -451,7 +467,6 @@ class DictProperty(Property):
         return value_to_json(value)
 
 
-
 class StringDictProperty(DictProperty):
 
     def to_python(self, value):
@@ -463,17 +478,17 @@ class StringDictProperty(DictProperty):
         except BadValueError:
             raise BadValueError(
                 'Items of %s dict must all be in %s' %
-                    (self.name, basestring))
+                (self.name, basestring))
         return value
-
 
 
 class ListProperty(Property):
     """A property that stores a list of things.
 
       """
+
     def __init__(self, verbose_name=None, default=None,
-            required=False, item_type=None, **kwds):
+                 required=False, item_type=None, **kwds):
         """Construct ListProperty.
 
 
@@ -491,7 +506,7 @@ class ListProperty(Property):
         self.item_type = item_type
 
         Property.__init__(self, verbose_name, default=default,
-            required=required, **kwds)
+                          required=required, **kwds)
 
     data_type = list
 
@@ -510,7 +525,7 @@ class ListProperty(Property):
         except BadValueError:
             raise BadValueError(
                 'Items of %s list must all be in %s' %
-                    (self.name, ALLOWED_PROPERTY_TYPES))
+                (self.name, ALLOWED_PROPERTY_TYPES))
         return value
 
     def default_value(self):
@@ -539,12 +554,9 @@ class StringListProperty(ListProperty):
     """ shorthand for list that should containe only unicode"""
 
     def __init__(self, verbose_name=None, default=None,
-            required=False, **kwds):
+                 required=False, **kwds):
         super(StringListProperty, self).__init__(verbose_name=verbose_name,
-            default=default, required=required, item_type=basestring, **kwds)
-
-
-
+                                                 default=default, required=required, item_type=basestring, **kwds)
 
 
 #  dict proxy
@@ -588,7 +600,7 @@ class LazyDict(dict):
             self.doc[key] = []
             value = LazyList(self.doc[key], item_type=self.item_type, init_vals=value)
         else:
-            self.doc.update({key: value_to_json(value, item_type=self.item_type) })
+            self.doc.update({key: value_to_json(value, item_type=self.item_type)})
         super(LazyDict, self).__setitem__(key, value)
 
     def __delitem__(self, key):
@@ -674,7 +686,6 @@ class LazyList(list):
             self.doc[index] = value_to_json(value, item_type=self.item_type)
         list.__setitem__(self, index, value)
 
-
     def __delslice__(self, i, j):
         del self.doc[i:j]
         list.__delslice__(self, i, j)
@@ -738,6 +749,7 @@ class LazyList(list):
         self.doc.reverse()
         list.reverse(self)
 
+
 if support_setproperty:
     class SetProperty(Property):
         """A property that stores a Python set as a list of unique
@@ -748,6 +760,7 @@ if support_setproperty:
         while operations like update that change a set object in-place do
         keep the list in sync.
         """
+
         def __init__(self, verbose_name=None, default=None, required=None,
                      item_type=None, **kwds):
             """Construct SetProperty.
@@ -793,7 +806,7 @@ if support_setproperty:
             except BadValueError:
                 raise BadValueError(
                     'Items of %s set must all be in %s' %
-                        (self.name, ALLOWED_PROPERTY_TYPES))
+                    (self.name, ALLOWED_PROPERTY_TYPES))
             return value
 
         def default_value(self):
@@ -827,14 +840,17 @@ if support_setproperty:
         alter _doc, while methods like update that change a set object
         in-place do keep _doc in sync.
         """
+
         def _map_named_operation(opname):
             fn = getattr(MutableSet, opname)
             if hasattr(fn, 'im_func'):
                 fn = fn.im_func
+
             def method(self, other, fn=fn):
                 if not isinstance(other, MutableSet):
                     other = self._from_iterable(other)
                 return fn(self, other)
+
             return method
 
         issubset = _map_named_operation('__le__')
@@ -945,22 +961,23 @@ if support_setproperty:
 # some mapping
 
 MAP_TYPES_PROPERTIES = {
-        decimal.Decimal: DecimalProperty,
-        datetime.datetime: DateTimeProperty,
-        datetime.date: DateProperty,
-        datetime.time: TimeProperty,
-        str: StringProperty,
-        unicode: StringProperty,
-        bool: BooleanProperty,
-        int: IntegerProperty,
-        long: LongProperty,
-        float: FloatProperty,
-        list: ListProperty,
-        dict: DictProperty
+    decimal.Decimal:   DecimalProperty,
+    datetime.datetime: DateTimeProperty,
+    datetime.date:     DateProperty,
+    datetime.time:     TimeProperty,
+    str:               StringProperty,
+    unicode:           StringProperty,
+    bool:              BooleanProperty,
+    int:               IntegerProperty,
+    long:              LongProperty,
+    float:             FloatProperty,
+    list:              ListProperty,
+    dict:              DictProperty
 }
 
 if support_setproperty:
     MAP_TYPES_PROPERTIES[set] = SetProperty
+
 
 def convert_property(value):
     """ convert a value to json from Property._to_json """
@@ -978,20 +995,24 @@ def value_to_property(value):
     else:
         return value
 
+
 # utilities functions
 
 def validate_list_content(value, item_type=None):
     """ validate type of values in a list """
     return [validate_content(item, item_type=item_type) for item in value]
 
+
 def validate_dict_content(value, item_type=None):
     """ validate type of values in a dict """
     return dict([(k, validate_content(v,
-                item_type=item_type)) for k, v in value.iteritems()])
+                                      item_type=item_type)) for k, v in value.iteritems()])
+
 
 def validate_set_content(value, item_type=None):
     """ validate type of values in a set """
     return set(validate_content(item, item_type=item_type) for item in value)
+
 
 def validate_content(value, item_type=None):
     """ validate a value. test if value is in supported types """
@@ -1003,18 +1024,21 @@ def validate_content(value, item_type=None):
         raise BadValueError(
             'Items  must all be in %s' % item_type)
     elif type(value) not in ALLOWED_PROPERTY_TYPES:
-            raise BadValueError(
-                'Items  must all be in %s' %
-                    (ALLOWED_PROPERTY_TYPES))
+        raise BadValueError(
+            'Items  must all be in %s' %
+            (ALLOWED_PROPERTY_TYPES))
     return value
+
 
 def dict_to_json(value, item_type=None):
     """ convert a dict to json """
     return dict([(k, value_to_json(v, item_type=item_type)) for k, v in value.iteritems()])
 
+
 def list_to_json(value, item_type=None):
     """ convert a list to json """
     return [value_to_json(item, item_type=item_type) for item in value]
+
 
 def value_to_json(value, item_type=None):
     """ convert a value to json using appropriate regexp.
@@ -1034,6 +1058,7 @@ def value_to_json(value, item_type=None):
     elif isinstance(value, dict):
         value = dict_to_json(value, item_type)
     return value
+
 
 def is_type_ok(item_type, value_type):
     return item_type is None or item_type == value_type
@@ -1056,7 +1081,7 @@ def value_to_python(value, item_type=None):
         if data_type is not None:
             prop = MAP_TYPES_PROPERTIES[data_type]()
             try:
-                #sometimes regex fail so return value
+                # sometimes regex fail so return value
                 value = prop.to_python(value)
             except:
                 pass
@@ -1066,9 +1091,11 @@ def value_to_python(value, item_type=None):
         value = dict_to_python(value, item_type=item_type)
     return value
 
+
 def list_to_python(value, item_type=None):
     """ convert a list of json values to python list """
     return [value_to_python(item, item_type=item_type) for item in value]
+
 
 def dict_to_python(value, item_type=None):
     """ convert a json object values to python dict """

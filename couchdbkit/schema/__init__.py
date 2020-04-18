@@ -156,33 +156,11 @@ all threads. It's better to use the db object methods if you want to be
 threadsafe.
 """
 
-from .properties import (
-        ALLOWED_PROPERTY_TYPES,
-        Property,
-        StringProperty,
-        IntegerProperty,
-        DecimalProperty,
-        BooleanProperty,
-        FloatProperty,
-        DateTimeProperty,
-        DateProperty,
-        TimeProperty,
-        DictProperty,
-        StringDictProperty,
-        ListProperty,
-        StringListProperty,
-        SetProperty,
-        dict_to_json,
-        list_to_json,
-        value_to_json,
-        MAP_TYPES_PROPERTIES,
-        value_to_python,
-        dict_to_python,
-        list_to_python,
-        convert_property,
-        value_to_property,
-        LazyDict,
-        LazyList)
+from .properties import (ALLOWED_PROPERTY_TYPES, BooleanProperty, DateProperty, DateTimeProperty, DecimalProperty,
+                         DictProperty, FloatProperty, IntegerProperty, LazyDict, LazyList, ListProperty,
+                         MAP_TYPES_PROPERTIES, Property, SetProperty, StringDictProperty, StringListProperty,
+                         StringProperty, TimeProperty, convert_property, dict_to_json, dict_to_python, list_to_json,
+                         list_to_python, value_to_json, value_to_property, value_to_python)
 
 try:
     from .properties import SetProperty, LazySet
@@ -190,21 +168,22 @@ except ImportError:
     pass
 
 from .base import (
-        ReservedWordError,
-        ALLOWED_PROPERTY_TYPES,
-        DocumentSchema,
-        SchemaProperties,
-        DocumentBase,
-        QueryMixin,
-        AttachmentMixin,
-        Document,
-        StaticDocument,
-        valid_id)
+    ReservedWordError,
+    ALLOWED_PROPERTY_TYPES,
+    DocumentSchema,
+    SchemaProperties,
+    DocumentBase,
+    QueryMixin,
+    AttachmentMixin,
+    Document,
+    StaticDocument,
+    valid_id)
 
 from .properties_proxy import (
-        SchemaProperty,
-        SchemaListProperty,
-        SchemaDictProperty)
+    SchemaProperty,
+    SchemaListProperty,
+    SchemaDictProperty)
+
 
 def contain(db, *docs):
     """ associate a db to multiple `Document` class"""

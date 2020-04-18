@@ -19,27 +19,28 @@ Maintain registry of documents used in your django project
 and manage db sessions
 """
 
-import sys
 import os
+import sys
 
-from restkit import BasicAuth
-from couchdbkit import Server
-from couchdbkit import push
-from couchdbkit.resource import CouchdbResource
-from couchdbkit.exceptions import ResourceNotFound
 from django.conf import settings
 from django.utils.datastructures import SortedDict
+from restkit import BasicAuth
+
+from couchdbkit import Server, push
+from couchdbkit.exceptions import ResourceNotFound
+from couchdbkit.resource import CouchdbResource
 
 COUCHDB_DATABASES = getattr(settings, "COUCHDB_DATABASES", [])
 COUCHDB_TIMEOUT = getattr(settings, "COUCHDB_TIMEOUT", 300)
+
 
 class CouchdbkitHandler(object):
     """ The couchdbkit handler for django """
 
     # share state between instances
     __shared_state__ = dict(
-            _databases = {},
-            app_schema = SortedDict()
+        _databases={},
+        app_schema=SortedDict()
     )
 
     def __init__(self, databases):
@@ -99,15 +100,16 @@ class CouchdbkitHandler(object):
         for app_label in app_labels:
             if not app_label in self._databases:
                 continue
-            if verbosity >=1:
-                print "sync `%s` in CouchDB" % app_name
+            if verbosity >= 1:
+                print
+                "sync `%s` in CouchDB" % app_name
             db = self.get_db(app_label)
 
             app_path = os.path.abspath(os.path.join(sys.modules[app.__name__].__file__, ".."))
             design_path = "%s/%s" % (app_path, "_design")
             if not os.path.isdir(design_path):
                 if settings.DEBUG:
-                    print >>sys.stderr, "%s don't exists, no ddoc synchronized" % design_path
+                    print >> sys.stderr, "%s don't exists, no ddoc synchronized" % design_path
                 return
 
             if temp:
@@ -118,18 +120,18 @@ class CouchdbkitHandler(object):
             docid = "_design/%s" % design_name
 
             push(os.path.join(app_path, "_design"), db, force=True,
-                    docid=docid)
+                 docid=docid)
 
             if temp:
                 ddoc = db[docid]
                 view_names = ddoc.get('views', {}).keys()
                 if len(view_names) > 0:
                     if verbosity >= 1:
-                        print 'Triggering view rebuild'
+                        print
+                        'Triggering view rebuild'
 
                     view = '%s/%s' % (design_name, view_names[0])
                     list(db.view(view, limit=0))
-
 
     def copy_designs(self, app, temp, verbosity=2, delete=True):
         """ Copies temporary view over the existing ones
@@ -147,14 +149,15 @@ class CouchdbkitHandler(object):
         for app_label in app_labels:
             if not app_label in self._databases:
                 continue
-            if verbosity >=1:
-                print "Copy prepared design docs for `%s`" % app_name
+            if verbosity >= 1:
+                print
+                "Copy prepared design docs for `%s`" % app_name
             db = self.get_db(app_label)
 
             tmp_name = '%s-%s' % (app_label, temp)
 
             from_id = '_design/%s' % tmp_name
-            to_id   = '_design/%s' % app_label
+            to_id = '_design/%s' % app_label
 
             try:
                 db.copy_doc(from_id, to_id)
@@ -163,9 +166,9 @@ class CouchdbkitHandler(object):
                     del db[from_id]
 
             except ResourceNotFound:
-                print '%s not found.' % (from_id, )
+                print
+                '%s not found.' % (from_id,)
                 return
-
 
     def get_db(self, app_label, register=False):
         """ retrieve db session for a django application """
@@ -194,6 +197,7 @@ class CouchdbkitHandler(object):
     def get_schema(self, app_label, schema_name):
         """ retriev Document object from its name and app name """
         return self.app_schema.get(app_label, SortedDict()).get(schema_name.lower())
+
 
 couchdbkit_handler = CouchdbkitHandler(COUCHDB_DATABASES)
 register_schema = couchdbkit_handler.register_schema

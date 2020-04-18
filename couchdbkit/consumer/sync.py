@@ -10,6 +10,7 @@ from ..utils import json
 
 __all__ = ['SyncConsumer']
 
+
 class SyncConsumer(ConsumerBase):
 
     def wait_once(self, cb=None, **params):
