@@ -63,7 +63,7 @@ def apply_lib(doc, funcs, app_dir, objs):
             try:
                 funcs[k] = run_json_macros(doc,
                                            run_code_macros(v, app_dir), app_dir)
-            except ValueError, e:
+            except ValueError as e:
                 raise MacroError(
                     "Error running !code or !json on function \"%s\": %s" % (k, e))
             if old_v != funcs[k]:
@@ -83,7 +83,7 @@ def run_code_macros(f_string, app_dir):
                 if cnt.find("!code") >= 0:
                     cnt = run_code_macros(cnt, app_dir)
                 library += cnt
-            except IOError, e:
+            except IOError as e:
                 raise MacroError(str(e))
             filenum += 1
 
@@ -113,7 +113,7 @@ def run_json_macros(doc, f_string, app_dir):
                         library = read_json(filename)
                     else:
                         library = read_file(filename)
-                except IOError, e:
+                except IOError as e:
                     raise MacroError(str(e))
                 filenum += 1
                 current_file = filename.split(app_dir)[1]

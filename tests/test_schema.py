@@ -44,7 +44,7 @@ class DocumentTestCase(unittest.TestCase):
         doc.foo="test"
         try:
             doc.bar="bla"
-        except AttributeError, e:
+        except AttributeError as e:
             self.assert_(str(e) == "bar is not defined in schema (not a valid property)")
         doc.save()
         self.assert_(not hasattr(doc, "bar"))
@@ -59,7 +59,7 @@ class DocumentTestCase(unittest.TestCase):
         doc.foo="test"
         try:
             doc.bar="bla"
-        except AttributeError, e:
+        except AttributeError as e:
             self.assert_(str(e) == "bar is not defined in schema (not a valid property)")
         doc.save()
         self.assert_(not hasattr(doc, "bar"))
@@ -181,14 +181,14 @@ class DocumentTestCase(unittest.TestCase):
 
         try:
             Test.bulk_save( [doc1, doc2, doc3] )
-        except TypeError, e:
+        except TypeError as e:
             self.assert_(str(e)== "doc database required to save document" )
 
         Test.set_db( db )
         bad_doc = Test2(string="bad_doc")
         try:
             Test.bulk_save( [doc1, doc2, doc3, bad_doc] )
-        except ValueError, e:
+        except ValueError as e:
             self.assert_(str(e) == "one of your documents does not have the correct type" )
 
         Test.bulk_save( [doc1, doc2, doc3] )
@@ -929,7 +929,7 @@ class PropertyTestCase(unittest.TestCase):
 
     def testSchemaWithPythonTypes(self):
         class A(Document):
-            c = unicode()
+            c = str()
             i = int(4)
         a = A()
         self.assert_(a._doc == {'c': u'', 'doc_type': 'A', 'i': 4})
@@ -1111,8 +1111,8 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a1.s, a2.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)}]
         })
         b.slm.append(a3)
         c = b.slm[1:3]
@@ -1123,7 +1123,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual(b.slm[0].s, a1.s)
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)}]
         })
 
 
@@ -1183,8 +1183,8 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a1.s, a2.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)}]
         })
 
 
@@ -1237,9 +1237,9 @@ class PropertyTestCase(unittest.TestCase):
             [b.slm[0].s, b.slm[1].s, b.slm[2].s], [a1.s, a2.s, a3.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)},
-                    {'doc_type': 'A', 's': unicode(a3.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)},
+                    {'doc_type': 'A', 's': str(a3.s)}]
         })
 
 
@@ -1266,8 +1266,8 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a1.s, a2.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)}]
         })
         v = b.slm.pop(0)
         self.assertEqual(v.s, a1.s)
@@ -1275,7 +1275,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual(b.slm[0].s, a2.s)
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a2.s)}]
         })
 
 
@@ -1299,7 +1299,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual(b.slm[0].s, a2.s)
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a2.s)}]
         })
         with self.assertRaises(ValueError) as cm:
             b.slm.remove(a1)
@@ -1325,8 +1325,8 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a2.s, a1.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a2.s)},
-                    {'doc_type': 'A', 's': unicode(a1.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a2.s)},
+                    {'doc_type': 'A', 's': str(a1.s)}]
         })
 
 
@@ -1349,22 +1349,22 @@ class PropertyTestCase(unittest.TestCase):
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a1.s, a2.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)}]
         })
         b.slm.sort(key=lambda item: item['s'], reverse=True)
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a2.s, a1.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a2.s)},
-                    {'doc_type': 'A', 's': unicode(a1.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a2.s)},
+                    {'doc_type': 'A', 's': str(a1.s)}]
         })
         b.slm.sort(cmp=lambda x, y: cmp(x['s'].lower(), y['s'].lower()))
         self.assertEqual([b.slm[0].s, b.slm[1].s], [a1.s, a2.s])
         self.assertEqual(b._doc, {
             'doc_type': 'B',
-            'slm': [{'doc_type': 'A', 's': unicode(a1.s)},
-                    {'doc_type': 'A', 's': unicode(a2.s)}]
+            'slm': [{'doc_type': 'A', 's': str(a1.s)},
+                    {'doc_type': 'A', 's': str(a2.s)}]
         })
 
 
@@ -1448,7 +1448,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertRaises(BadValueError, a.save)
         try:
             a.validate()
-        except BadValueError, e:
+        except BadValueError as e:
             pass
         self.assert_(str(e) == 'Property l is required.')
 
@@ -1668,7 +1668,7 @@ class PropertyTestCase(unittest.TestCase):
         self.assertRaises(BadValueError, a.save)
         try:
             a.save()
-        except BadValueError, e:
+        except BadValueError as e:
             pass
         self.assert_(str(e) == 'Property d is required.')
 

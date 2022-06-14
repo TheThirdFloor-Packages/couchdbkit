@@ -38,12 +38,9 @@ if support_setproperty:
     __all__ += ['SetProperty', 'LazySet']
 
 ALLOWED_PROPERTY_TYPES = set([
-    basestring,
     str,
-    unicode,
     bool,
     int,
-    long,
     float,
     datetime.datetime,
     datetime.date,
@@ -165,7 +162,7 @@ class Property(object):
 
     def to_python(self, value):
         """ convert to python type """
-        return unicode(value)
+        return str(value)
 
     def to_json(self, value):
         """ convert to json, Converted value is saved in couchdb. """
@@ -180,7 +177,7 @@ class StringProperty(Property):
     *Value type*: unicode
     """
 
-    to_python = unicode
+    to_python = str
 
     def validate(self, value, required=True):
         value = super(StringProperty, self).validate(value,
@@ -194,7 +191,7 @@ class StringProperty(Property):
                 'Property %s must be unicode or str instance, not a %s' % (self.name, type(value).__name__))
         return value
 
-    data_type = unicode
+    data_type = str
 
 
 class IntegerProperty(Property):
@@ -214,7 +211,7 @@ class IntegerProperty(Property):
         if value is None:
             return value
 
-        if value is not None and not isinstance(value, (int, long,)):
+        if value is not None and not isinstance(value, int):
             raise BadValueError(
                 'Property %s must be %s or long instance, not a %s'
                 % (self.name, type(self.data_type).__name__,
@@ -292,7 +289,7 @@ class DecimalProperty(Property):
         return decimal.Decimal(value)
 
     def to_json(self, value):
-        return unicode(value)
+        return str(value)
 
 
 class DateTimeProperty(Property):
@@ -966,10 +963,8 @@ MAP_TYPES_PROPERTIES = {
     datetime.date:     DateProperty,
     datetime.time:     TimeProperty,
     str:               StringProperty,
-    unicode:           StringProperty,
     bool:              BooleanProperty,
     int:               IntegerProperty,
-    long:              LongProperty,
     float:             FloatProperty,
     list:              ListProperty,
     dict:              DictProperty
@@ -1052,7 +1047,7 @@ def value_to_json(value, item_type=None):
     elif isinstance(value, datetime.time) and is_type_ok(item_type, datetime.time):
         value = value.replace(microsecond=0).isoformat()
     elif isinstance(value, decimal.Decimal) and is_type_ok(item_type, decimal.Decimal):
-        value = unicode(value)
+        value = str(value)
     elif isinstance(value, (list, MutableSet)):
         value = list_to_json(value, item_type)
     elif isinstance(value, dict):

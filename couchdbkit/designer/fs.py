@@ -427,7 +427,7 @@ def pushapps(path, dbs, atomic=True, export=False, couchapprc=False):
                 docs = [doc.doc(db) for doc in apps]
                 try:
                     db.save_docs(docs)
-                except BulkSaveError, e:
+                except BulkSaveError as e:
                     docs1 = []
                     for doc in e.errors:
                         try:
@@ -492,7 +492,7 @@ def pushdocs(path, dbs, atomic=True, export=False):
                         docs1.append(newdoc)
                 try:
                     db.save_docs(docs1)
-                except BulkSaveError, e:
+                except BulkSaveError as e:
                     # resolve conflicts
                     docs1 = []
                     for doc in e.errors:

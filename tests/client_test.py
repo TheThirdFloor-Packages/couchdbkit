@@ -526,7 +526,7 @@ class ClientDatabaseTestCase(unittest.TestCase):
         all_errors = []
         try:
             db.bulk_save(docs2)
-        except BulkSaveError, e:
+        except BulkSaveError as e:
             all_errors = e.errors
 
         self.assert_(len(all_errors) == 2)
@@ -544,7 +544,7 @@ class ClientDatabaseTestCase(unittest.TestCase):
         all_errors2 = []
         try:
             db.bulk_save(docs3, all_or_nothing=True)
-        except BulkSaveError, e:
+        except BulkSaveError as e:
             all_errors2 = e.errors
 
         self.assert_(len(all_errors2) == 0)

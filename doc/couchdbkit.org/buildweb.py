@@ -126,7 +126,7 @@ class Site(object):
                     f.write(page.render())
                 finally:
                     f.close()
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 raise
             self.sitemap.append(page)
         if blog is not None:
@@ -249,7 +249,7 @@ class Blog(object):
                     f.write(page.render())
                 finally:
                     f.close()
-            except (IOError, OSError), err:
+            except (IOError, OSError) as err:
                 raise
             self.site.sitemap.append(page)
 
@@ -294,7 +294,7 @@ class Page(object):
                 (header_lines,body) = raw.split("\n\n", 1)
                 for header in header_lines.split("\n"):
                     (name, value) = header.split(": ", 1)
-                    headers[name.lower()] = unicode(value.strip())
+                    headers[name.lower()] = str(value.strip())
                 self.headers = headers
                 self.headers['pubDate'] = os.stat(self.finput)[ST_CTIME]
                 self.headers['published'] = datetime.datetime.fromtimestamp(self.headers['pubDate'])

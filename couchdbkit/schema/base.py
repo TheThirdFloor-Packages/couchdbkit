@@ -235,7 +235,7 @@ class DocumentSchema(object):
             return self._doc.get(key)
         try:
             return self.__dict__[key]
-        except KeyError, e:
+        except KeyError as e:
             raise AttributeError(e)
 
     def __getitem__(self, key):
@@ -261,8 +261,8 @@ class DocumentSchema(object):
         """
         try:
             delattr(self, key)
-        except AttributeError, e:
-            raise KeyError, e
+        except AttributeError as e:
+            raise KeyError as e
 
     def __contains__(self, key):
         """ does object contain this propery ?

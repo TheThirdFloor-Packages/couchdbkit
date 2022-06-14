@@ -134,7 +134,7 @@ def to_bytestring(s):
     """ convert to bytestring an unicode """
     if not isinstance(s, basestring):
         return s
-    if isinstance(s, unicode):
+    if isinstance(s, str):
         return s.encode('utf-8')
     else:
         return s
