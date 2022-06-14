@@ -79,7 +79,7 @@ class ClientServerTestCase(unittest.TestCase):
 
     def testGetUUIDS(self):
         uuid = self.Server.next_uuid()
-        self.assert_(isinstance(uuid, basestring) == True)
+        self.assert_(isinstance(uuid, str) == True)
         self.assert_(len(self.Server._uuids) == 999)
         uuid2 = self.Server.next_uuid()
         self.assert_(uuid != uuid2)

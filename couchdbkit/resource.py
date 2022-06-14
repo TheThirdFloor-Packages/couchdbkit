@@ -101,7 +101,7 @@ class CouchdbResource(Resource):
 
         if payload is not None:
             # TODO: handle case we want to put in payload json file.
-            if not hasattr(payload, 'read') and not isinstance(payload, basestring):
+            if not hasattr(payload, 'read') and not isinstance(payload, str):
                 payload = json.dumps(payload).encode('utf-8')
                 headers.setdefault('Content-Type', 'application/json')
 
@@ -151,7 +151,7 @@ def encode_params(params):
                 value = json.dumps(value)
             elif value is None:
                 continue
-            elif not isinstance(value, basestring):
+            elif not isinstance(value, str):
                 value = json.dumps(value)
             _params[name] = value
     return _params

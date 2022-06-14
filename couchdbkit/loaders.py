@@ -48,13 +48,13 @@ class FileSystemDocsLoader(BaseDocsLoader):
     """
 
     def __init__(self, designpath, docpath=None):
-        if isinstance(designpath, basestring):
+        if isinstance(designpath, str):
             self.designpaths = [designpath]
         else:
             self.designpaths = designpath
 
         docpath = docpath or []
-        if isinstance(docpath, basestring):
+        if isinstance(docpath, str):
             docpath = [docpath]
         self.docpaths = docpath
 

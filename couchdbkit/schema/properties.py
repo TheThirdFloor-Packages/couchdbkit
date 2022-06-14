@@ -186,7 +186,7 @@ class StringProperty(Property):
         if value is None:
             return value
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             raise BadValueError(
                 'Property %s must be unicode or str instance, not a %s' % (self.name, type(value).__name__))
         return value
@@ -323,7 +323,7 @@ class DateTimeProperty(Property):
         return Property.default_value(self)
 
     def to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 value = value.split('.', 1)[0]  # strip out microseconds
                 value = value[0:19]  # remove timezone
@@ -361,7 +361,7 @@ class DateProperty(DateTimeProperty):
         return datetime.datetime.now().date()
 
     def to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 value = datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
             except ValueError as e:
@@ -389,7 +389,7 @@ class TimeProperty(DateTimeProperty):
         return datetime.datetime.now().time()
 
     def to_python(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 value = value.split('.', 1)[0]  # strip out microseconds
                 value = datetime.time(*time.strptime(value, '%H:%M:%S')[3:6])
@@ -467,15 +467,15 @@ class DictProperty(Property):
 class StringDictProperty(DictProperty):
 
     def to_python(self, value):
-        return LazyDict(value, item_type=basestring)
+        return LazyDict(value, item_type=str)
 
     def validate_dict_contents(self, value):
         try:
-            value = validate_dict_content(value, basestring)
+            value = validate_dict_content(value, str)
         except BadValueError:
             raise BadValueError(
                 'Items of %s dict must all be in %s' %
-                (self.name, basestring))
+                (self.name, str))
         return value
 
 
@@ -553,7 +553,7 @@ class StringListProperty(ListProperty):
     def __init__(self, verbose_name=None, default=None,
                  required=False, **kwds):
         super(StringListProperty, self).__init__(verbose_name=verbose_name,
-                                                 default=default, required=required, item_type=basestring, **kwds)
+                                                 default=default, required=required, item_type=str, **kwds)
 
 
 #  dict proxy
@@ -1064,7 +1064,7 @@ def value_to_python(value, item_type=None):
     have been put in json via `value_to_json` .
     """
     data_type = None
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         if re_date.match(value) and is_type_ok(item_type, datetime.date):
             data_type = datetime.date
         elif re_time.match(value) and is_type_ok(item_type, datetime.time):

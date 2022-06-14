@@ -666,7 +666,7 @@ class Database(object):
 
             docid = resource.escape_docid(doc1['_id'])
             result = self.res.delete(docid, rev=doc1['_rev'], **params).json_body
-        elif isinstance(doc1, basestring):  # we get a docid
+        elif isinstance(doc1, str):  # we get a docid
             rev = self.get_rev(doc1)
             docid = resource.escape_docid(doc1)
             result = self.res.delete(docid, rev=rev, **params).json_body
@@ -686,14 +686,14 @@ class Database(object):
     def copy_doc(self, doc, dest=None, headers=None):
         """ copy an existing document to a new id. If dest is None, a new uuid will be requested
         @param doc: dict or string, document or document id
-        @param dest: basestring or dict. if _rev is specified in dict it will override the doc
+        @param dest: str or dict. if _rev is specified in dict it will override the doc
         """
 
         if not headers:
             headers = {}
 
         doc1, schema = _maybe_serialize(doc)
-        if isinstance(doc1, basestring):
+        if isinstance(doc1, str):
             docid = doc1
         else:
             if not '_id' in doc1:
@@ -702,7 +702,7 @@ class Database(object):
 
         if dest is None:
             destination = self.server.next_uuid(count=1)
-        elif isinstance(dest, basestring):
+        elif isinstance(dest, str):
             if dest in self:
                 dest = self.get(dest)
                 destination = "%s?rev=%s" % (dest['_id'], dest['_rev'])
@@ -880,7 +880,7 @@ class Database(object):
         @return: `restkit.httpc.Response` object
         """
 
-        if isinstance(id_or_doc, basestring):
+        if isinstance(id_or_doc, str):
             docid = id_or_doc
         else:
             doc, schema = _maybe_serialize(id_or_doc)

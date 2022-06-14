@@ -29,7 +29,7 @@ def check_reserved_words(attr_name):
 
 
 def valid_id(value):
-    if isinstance(value, basestring) and not value.startswith('_'):
+    if isinstance(value, str) and not value.startswith('_'):
         return value
     raise TypeError('id "%s" is invalid' % value)
 
@@ -262,7 +262,7 @@ class DocumentSchema(object):
         try:
             delattr(self, key)
         except AttributeError as e:
-            raise KeyError as e
+            raise KeyError
 
     def __contains__(self, key):
         """ does object contain this propery ?
