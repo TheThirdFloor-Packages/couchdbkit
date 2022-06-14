@@ -51,7 +51,9 @@ setup(
 
     zip_safe = False,
 
-    install_requires = [ 'restkit>=4.2.2' ],
+    install_requires = [ 
+        'restkit @ https://github.com/TheThirdFloor-Packages/restkit.git' 
+    ],
 
     entry_points="""
     [couchdbkit.consumers]
