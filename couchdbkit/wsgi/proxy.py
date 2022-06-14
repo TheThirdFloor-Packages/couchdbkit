@@ -3,7 +3,7 @@
 # This file is part of couchdbkit released under the MIT license. 
 # See the NOTICE for more information.
 
-import urlparse
+from urllib.parse import urlparse
 from restkit.contrib.wsgi_proxy import ALLOWED_METHODS, HostProxy
 from webob import Request
 
