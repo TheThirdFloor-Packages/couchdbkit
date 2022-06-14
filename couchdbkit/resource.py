@@ -171,7 +171,7 @@ re_sp = re.compile('\s')
 
 
 def encode_attachments(attachments):
-    for k, v in attachments.iteritems():
+    for k, v in attachments.items():
         if v.get('stub', False):
             continue
         else:

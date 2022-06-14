@@ -48,7 +48,7 @@ def package_shows(doc, funcs, app_dir, objs):
 
 
 def package_views(doc, views, app_dir, objs):
-    for view, funcs in views.iteritems():
+    for view, funcs in views.items():
         if hasattr(funcs, "items"):
             apply_lib(doc, funcs, app_dir, objs)
 
@@ -158,7 +158,7 @@ def run_json_macros(doc, f_string, app_dir):
     if not included:
         return f_string
 
-    for k, v in included.iteritems():
+    for k, v in included.items():
         varstrings.append("var %s = %s;" % (k, json.dumps(v).encode('utf-8')))
 
     return re_json.sub(rjson2, f_string)

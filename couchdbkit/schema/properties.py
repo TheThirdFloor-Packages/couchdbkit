@@ -1001,7 +1001,7 @@ def validate_list_content(value, item_type=None):
 def validate_dict_content(value, item_type=None):
     """ validate type of values in a dict """
     return dict([(k, validate_content(v,
-                                      item_type=item_type)) for k, v in value.iteritems()])
+                                      item_type=item_type)) for k, v in value.items()])
 
 
 def validate_set_content(value, item_type=None):
@@ -1027,7 +1027,7 @@ def validate_content(value, item_type=None):
 
 def dict_to_json(value, item_type=None):
     """ convert a dict to json """
-    return dict([(k, value_to_json(v, item_type=item_type)) for k, v in value.iteritems()])
+    return dict([(k, value_to_json(v, item_type=item_type)) for k, v in value.items()])
 
 
 def list_to_json(value, item_type=None):
@@ -1094,4 +1094,4 @@ def list_to_python(value, item_type=None):
 
 def dict_to_python(value, item_type=None):
     """ convert a json object values to python dict """
-    return dict([(k, value_to_python(v, item_type=item_type)) for k, v in value.iteritems()])
+    return dict([(k, value_to_python(v, item_type=item_type)) for k, v in value.items()])

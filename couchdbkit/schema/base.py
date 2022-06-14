@@ -115,7 +115,7 @@ class DocumentSchema(object):
             self.__dict__[prop.name] = value
 
         _dynamic_properties = properties.copy()
-        for attr_name, value in _dynamic_properties.iteritems():
+        for attr_name, value in _dynamic_properties.items():
             if attr_name not in self._properties \
                     and value is not None:
                 if isinstance(value, p.Property):
@@ -318,7 +318,7 @@ class DocumentSchema(object):
             prop.__property_init__(instance, value)
 
         if cls._allow_dynamic_properties:
-            for attr_name, value in data.iteritems():
+            for attr_name, value in data.items():
                 if attr_name in instance.properties():
                     continue
                 if value is None:

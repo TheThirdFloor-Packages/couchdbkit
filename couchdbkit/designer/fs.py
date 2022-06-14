@@ -211,7 +211,7 @@ class FSDoc(object):
                             name = name[:-1]
                         dmanifest[name] = i
 
-                for vname, value in self._doc['views'].iteritems():
+                for vname, value in self._doc['views'].items():
                     if value and isinstance(value, dict):
                         views[vname] = value
                     else:
@@ -563,7 +563,7 @@ def clone(db, docid, dest=None, rev=None):
                     except KeyError:
                         break
 
-                    if isinstance(content, basestring):
+                    if isinstance(content, str):
                         _ref = md5(utils.to_bytestring(content)).hexdigest()
                         if objects and _ref in objects:
                             content = objects[_ref]
@@ -614,11 +614,11 @@ def clone(db, docid, dest=None, rev=None):
             vs_dir = os.path.join(path, key)
             if not os.path.isdir(vs_dir):
                 os.makedirs(vs_dir)
-            for vsname, vs_item in doc[key].iteritems():
+            for vsname, vs_item in doc[key].items():
                 vs_item_dir = os.path.join(vs_dir, vsname)
                 if not os.path.isdir(vs_item_dir):
                     os.makedirs(vs_item_dir)
-                for func_name, func in vs_item.iteritems():
+                for func_name, func in vs_item.items():
                     filename = os.path.join(vs_item_dir, '%s.js' %
                                             func_name)
                     utils.write_content(filename, func)
@@ -627,7 +627,7 @@ def clone(db, docid, dest=None, rev=None):
             showpath = os.path.join(path, key)
             if not os.path.isdir(showpath):
                 os.makedirs(showpath)
-            for func_name, func in doc[key].iteritems():
+            for func_name, func in doc[key].items():
                 filename = os.path.join(showpath, '%s.js' %
                                         func_name)
                 utils.write_content(filename, func)
@@ -644,9 +644,9 @@ def clone(db, docid, dest=None, rev=None):
                 elif isinstance(doc[key], dict):
                     if not os.path.isdir(filedir):
                         os.makedirs(filedir)
-                    for field, value in doc[key].iteritems():
+                    for field, value in doc[key].items():
                         fieldpath = os.path.join(filedir, field)
-                        if isinstance(value, basestring):
+                        if isinstance(value, str):
                             if value.startswith('base64-encoded;'):
                                 value = base64.b64decode(content[15:])
                             utils.write_content(fieldpath, value)
@@ -654,7 +654,7 @@ def clone(db, docid, dest=None, rev=None):
                             utils.write_json(fieldpath + '.json', value)
                 else:
                     value = doc[key]
-                    if not isinstance(value, basestring):
+                    if not isinstance(value, str):
                         value = str(value)
                     utils.write_content(filedir, value)
 

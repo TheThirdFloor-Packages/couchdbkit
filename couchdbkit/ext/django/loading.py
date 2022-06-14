@@ -56,7 +56,7 @@ class CouchdbkitHandler(object):
             )
 
         # create databases sessions
-        for app_name, app_setting in databases.iteritems():
+        for app_name, app_setting in databases.items():
             uri = app_setting['URL']
 
             # Do not send credentials when they are both None as admin party will give a 401
