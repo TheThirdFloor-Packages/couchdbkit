@@ -52,7 +52,7 @@ setup(
     zip_safe = False,
 
     install_requires = [
-        'restkit @ https://github.com/TheThirdFloor-Packages/restkit.git'
+        'restkit @ git+https://github.com/TheThirdFloor-Packages/restkit.git'
     ],
 
     entry_points="""
